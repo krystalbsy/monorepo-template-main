@@ -1,7 +1,7 @@
 # Monorepo
 
 -  *Siyu Bai*
--  *see-you bai* **(TODO: Change this)**
+-  *see-you bai*
 
 ## Important Documents 
 
