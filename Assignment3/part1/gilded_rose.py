@@ -20,36 +20,82 @@ class GildedRose(object):
 
     def update_quality(self):
         for item in self.items:
-            # Deal with Sulfuras
-            if item.name == "Sulfuras, Hand of Ragnaros":
-                continue
-            # Deal with Aged Brie
-            elif item.name == "Aged Brie":
-                item.quality = min(50, item.quality + 1)
-            # Deal with Backstage passes
-            elif item.name == "Backstage passes to a TAFKAL80ETC concert":
-                if item.sell_in > 10:
-                    item.quality += 1
-                elif 6 <= item.sell_in <= 10:
-                    item.quality += 2
-                elif 1 <= item.sell_in <= 5:
-                    item.quality += 3
-                # The item has expired
-                else:
-                    item.quality = 0
-                # Set the maximum quality to 50
-                if item.quality > 50:
-                    item.quality = 50
-            # Deal with normal items with the exception of Conjured items
+            if item.name == 'Aged Brie':
+                Brie(item).update_item()
+            elif item.name == 'Sulfuras, Hand of Ragnaros':
+                Sulfuras().update_item()
+            elif item.name == 'Backstage passes to a TAFKAL80ETC concert':
+                BackstagePasses(item).update_item()
+            elif item.name == 'Conjured Mana Cake':
+                Conjured(item).update_item()
             else:
-                degrade = 1
-                # Conjured items degrade twice as fast as normal items
-                if "Conjured" in item.name:
-                    degrade *= 2
-                # The item has expired
-                if item.sell_in <= 0:
+                NormalItem(item).update_item()
 
-                    degrade *= 2
-                # The minimum quality is 0
-                item.quality = max(0, item.quality - degrade)
-            item.sell_in -= 1
+
+class Brie(object):
+    def __init__(self, item: Item):
+        self.item = item
+
+    def update_item(self):
+        self.item.sell_in -= 1
+        self.item.quality += 1
+        self.item.quality = min(50, self.item.quality)
+
+
+class Sulfuras(object):
+    def update_item(self):
+        pass
+
+
+class BackstagePasses(object):
+    def __init__(self, item: Item):
+        self.item = item
+
+    def update_item(self):
+        self.item.sell_in -= 1
+
+        if self.item.sell_in > 10:
+            self.item.quality += 1
+        elif 6 <= self.item.sell_in <= 10:
+            self.item.quality += 2
+        elif 1 <= self.item.sell_in <= 5:
+            self.item.quality += 3
+        else:
+            # the item has expired
+            self.item.quality = 0
+
+        # Set the maximum quality to 50
+        self.item.quality = min(50, self.item.quality)
+
+
+class NormalItem(object):
+    def __init__(self, item: Item):
+        self.item = item
+        self.degrade = 1
+
+    def update_item(self):
+        self.item.sell_in -= 1
+
+        if self.item.sell_in >= 0:
+            self.item.quality -= self.degrade
+        else:
+            self.item.quality -= self.degrade * 2
+
+        self.item.quality = max(0, self.item.quality)
+
+
+class Conjured(object):
+    def __init__(self, item: Item):
+        self.item = item
+        # Conjured items degrade twice as fast as normal items
+        self.degrade = 1 * 2
+
+    def update_item(self):
+        self.item.sell_in -= 1
+        if self.item.sell_in >= 0:
+            self.item.quality -= self.degrade
+        else:
+            # The item has expired
+            self.item.quality -= self.degrade * 2
+        # The minimum quality is 0
+        self.item.quality = max(0, self.item.quality)

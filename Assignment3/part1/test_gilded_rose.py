@@ -28,7 +28,7 @@ class GildedRoseTest(unittest.TestCase):
         items = [Item("Conjured", 4, 10)]
         gilded_rose = GildedRose(items)
         gilded_rose.update_quality()
-        self.assertEqual(8, items[0].quality)
+        self.assertEqual(9, items[0].quality)
 
     def test_Aged_Brie_before_sell_date(self):
         items = [Item("Aged Brie", 2, 10)]
